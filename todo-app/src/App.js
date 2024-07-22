@@ -1,5 +1,7 @@
 import './App.css';
-import { useState } from 'react'
+import { useState } from 'react';
+
+
 
 function App() {
   const quote = ''
@@ -13,8 +15,12 @@ function App() {
     if (isEditing) {
       updateTodo();
     } else {
-      const capitalisedInput = input.toUpperCase()
-      setTodos([...todos, capitalisedInput])
+      const newTodo = {
+        text: input.toUpperCase(),
+        completed: false
+      };
+      setTodos([...todos, newTodo
+      ])
       setInput('')
     }
   };
@@ -27,12 +33,12 @@ function App() {
   const startEditing = index => {
     setIsEditing(true);
     setCurrentTodo(index);
-    setInput(todos[index]);
+    setInput(todos[index].text);
   };
 
   const updateTodo = () => {
     const updatedTodos = todos.map((todo, index) =>
-    index === currentTodo ? input.toUpperCase() : todo
+    index === currentTodo ? { ...todo, text: input.toUpperCase() } : todo
   );
   setTodos(updatedTodos);
   setInput('')
@@ -40,24 +46,40 @@ function App() {
   setCurrentTodo(null);
   };
 
+  const toggleComplete = index => {
+    const updatedTodos = todos.map((todo, i) =>
+    i === index ? {...todo, completed: !todo.completed } : todo);
+    setTodos(updatedTodos);
+  };
+
 
   return (
-    <div className="App">
-      <h1>My ToDo List</h1>
-      <p>{quote}</p>
+    <div className="App bg-dark text-white min-vh-100 p-5">
+      <h1 className="text-center text-warning mb-4">My ToDo List</h1>
+      <p className="text-center">{quote}</p>
 
-      <form>
-        <input value={input} onChange={e => setInput(e.target.value)} type="text"/>
-        <button type="submit" onClick={addTodo}>{isEditing ? 'Update ToDo' : 'Add ToDo'}</button>
+      <form className="d-flex justify-content-center mb-4">
+        <input className="form-control w-50 mr-2" value={input} onChange={e => setInput(e.target.value)} type="text"/>
+        <button className="btn btn-primary" type="submit" onClick={addTodo}>{isEditing ? 'Update ToDo' : 'Add ToDo'}</button>
       </form>
 
 
-      <h2>List of ToDos</h2>
+      <h2 className="text-center text-warning">List of ToDos</h2>
       {todos.map((todo, index) => (
-        <div key={index}>
-        <p>{todo}</p>
-        <button onClick={() => deleteTodo(index)}>Delete</button>
-        <button onClick={() => startEditing(index)}>Edit</button>
+        <div className="d-flex justify-content-between align-items-center bg-secondary p-2 mb-2 rounded" key={index}>
+        <p style={{
+            color: todo.completed ? 'lightgreen' : 'white',
+            textDecoration: todo.completed ? 'line-through' : 'none'
+          }}>
+            {todo.text}
+          </p>
+          <div className="ml-auto">
+          <button className="btn btn-success btn-sm mr-2" onClick={() => toggleComplete(index)}>
+            {todo.completed ? 'Undo' : 'Complete'}
+          </button>
+        <button className="btn btn-danger btn-sm mr-2" onClick={() => deleteTodo(index)}>Delete</button>
+        <button className="btn btn-warning btn-sm" onClick={() => startEditing(index)}>Edit</button>
+          </div>
       </div>
       ))}
 
